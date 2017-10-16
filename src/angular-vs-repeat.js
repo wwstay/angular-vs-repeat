@@ -403,6 +403,7 @@
                         });
 
                         $scope.$on('vsRepeatTrigger', refresh);
+                        $scope.$on('vsRepeatScrollTo', scrollTo);
 
                         $scope.$on('vsRepeatResize', function() {
                             autoSize = true;
@@ -475,7 +476,13 @@
                             }
                         });
 
-                        function updateInnerCollection() {
+                        function scrollTo(event, index) {
+                            $scope.startIndex = index;
+                            $scope.endIndex = index+10;
+                            updateInnerCollection(true)
+                        }
+
+                        function updateInnerCollection(manualScrollTo) {
                             var $scrollPosition = getScrollPos($scrollParent[0], scrollPos);
                             var $clientSize = getClientSize($scrollParent[0], clientSize);
 
@@ -531,13 +538,15 @@
                             _minStartIndex = Math.min(__startIndex, _minStartIndex);
                             _maxEndIndex = Math.max(__endIndex, _maxEndIndex);
 
-                            $scope.startIndex = $$options.latch ? _minStartIndex : __startIndex;
-                            $scope.endIndex = $$options.latch ? _maxEndIndex : __endIndex;
-
-                            // Move to the end of the collection if we are now past it
-                            if (_maxEndIndex < $scope.startIndex)
+                            if (!manualScrollTo) {
+                                $scope.startIndex = $$options.latch ? _minStartIndex : __startIndex;
+                                $scope.endIndex = $$options.latch ? _maxEndIndex : __endIndex;
+                                
+                                // Move to the end of the collection if we are now past it
+                                if (_maxEndIndex < $scope.startIndex)
                                 $scope.startIndex = _maxEndIndex;
-
+                            }
+                                
                             var digestRequired = false;
                             if (_prevStartIndex == null) {
                                 digestRequired = true;
@@ -562,6 +571,7 @@
                                                         $scope.endIndex !== _prevEndIndex;
                                 }
                             }
+
 
                             if (digestRequired) {
                                 $scope[collectionName] = originalCollection.slice($scope.startIndex, $scope.endIndex);
@@ -588,11 +598,17 @@
                                 var offsetCalculationString = sizesPropertyExists ?
                                     '(sizesCumulative[$index + startIndex] + offsetBefore)' :
                                     '(($index + startIndex) * elementSize + offsetBefore)';
+                                
 
                                 var parsed = $parse(offsetCalculationString);
                                 var o1 = parsed($scope, {$index: 0});
                                 var o2 = parsed($scope, {$index: $scope[collectionName].length});
                                 var total = $scope.totalSize;
+
+                                if (manualScrollTo) {
+                                    $scrollParent.scrollTop(o1)
+                                    return
+                                }
 
                                 $beforeContent.css(getLayoutProp(), o1 + 'px');
                                 $afterContent.css(getLayoutProp(), (total - o2) + 'px');
