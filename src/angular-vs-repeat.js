@@ -606,7 +606,8 @@
                                 var total = $scope.totalSize;
 
                                 if (manualScrollTo) {
-                                    $scrollParent.scrollTop(o1)
+                                    var scrolledHeight = 100;
+                                    $scrollParent.scrollTop(o1 - scrolledHeight)
                                     return
                                 }
 
