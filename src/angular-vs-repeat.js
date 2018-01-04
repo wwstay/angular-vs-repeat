@@ -477,7 +477,13 @@
                         });
 
                         function scrollTo(event, index) {
-                            $scope.startIndex = index;
+                            var viewElementCount = $scrollParent[0].childElementCount;
+                            if(index < viewElementCount){
+                                $scope.startIndex = 0;
+                            }
+                            else {
+                                $scope.startIndex = index;
+                            }
                             $scope.endIndex = index+10;
                             updateInnerCollection(true)
                         }
