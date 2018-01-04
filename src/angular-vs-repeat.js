@@ -613,7 +613,7 @@
 
                                 if (manualScrollTo) {
                                     var scrolledHeight = 100;
-                                    $scrollParent.scrollTop(o1)
+                                    $scrollParent.scrollTop(o1 - scrolledHeight)
                                     return
                                 }
 
