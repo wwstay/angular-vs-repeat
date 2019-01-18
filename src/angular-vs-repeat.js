@@ -64,6 +64,7 @@
     // vs-offset-after="value" - bottom/right offset in pixels (defaults to 0)
     // vs-excess="value" - an integer number representing the number of elements to be rendered outside of the current container's viewport
     //                      (defaults to 2)
+    // vs-items-per-row="value" - an integer number representing the number of elements in a row
     // vs-size - a property name of the items in collection that is a number denoting the element size (in pixels)
     // vs-autoresize - use this attribute without vs-size and without specifying element's size. The automatically computed element style will
     //              readjust upon window resize if the size is dependable on the viewport size
@@ -162,7 +163,8 @@
                         'vsOffsetAfter': 'offsetAfter',
                         'vsScrolledToEndOffset': 'scrolledToEndOffset',
                         'vsScrolledToBeginningOffset': 'scrolledToBeginningOffset',
-                        'vsExcess': 'excess'
+                        'vsExcess': 'excess',
+                        'vsItemsPerRow': 'itemsPerRow'
                     };
 
                 if (ngRepeatChild.attr('ng-repeat')) {
@@ -242,6 +244,7 @@
                         $scope.offsetBefore = 0;
                         $scope.offsetAfter = 0;
                         $scope.excess = 2;
+                        $scope.itemsPerRow = 1;
 
                         if ($$horizontal) {
                             $beforeContent.css('height', '100%');
@@ -580,6 +583,10 @@
 
 
                             if (digestRequired) {
+                                if ($scope.itemsPerRow > 1) {
+                                    $scope.startIndex = ($scope.startIndex % $scope.itemsPerRow !== 0) ? $scope.startIndex + ($scope.itemsPerRow - ($scope.startIndex % $scope.itemsPerRow)) : $scope.startIndex;
+                                    $scope.endIndex = ($scope.endIndex % $scope.itemsPerRow !== 0) ? $scope.endIndex + ($scope.itemsPerRow - ($scope.endIndex % $scope.itemsPerRow)) : $scope.endIndex;
+                                }
                                 $scope[collectionName] = originalCollection.slice($scope.startIndex, $scope.endIndex);
 
                                 // Emit the event
